@@ -1,0 +1,27 @@
+{
+  "name": "cache-debounce",
+  "version": "0.1.0",
+  "description": "Cache and debounce simultaneous async calls with a hash function and optional timeout",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "(cd test && mocha test)"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kapouer/cache-debounce"
+  },
+  "keywords": [
+    "cache",
+    "debounce",
+    "async"
+  ],
+  "author": "Jérémy Lal <kapouer@melix.org>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kapouer/cache-debounce/issues"
+  },
+  "homepage": "https://github.com/kapouer/cache-debounce"
+}
