@@ -1,6 +1,6 @@
 {
   "name": "cache-debounce",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Cache and debounce simultaneous async calls with a hash function and optional timeout",
   "main": "index.js",
   "directories": {
