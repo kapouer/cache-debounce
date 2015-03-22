@@ -1,7 +1,7 @@
 module.exports = cacheDebounce;
 
 function cacheDebounce(fn, hasher, timeout) {
-	if (typeof(hasher) !== 'function') {
+	if (typeof(hasher) != 'function') {
 		// Implement 'always'
 		var key = hasher;
 		hasher = function() {
