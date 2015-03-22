@@ -26,7 +26,7 @@ getTheStuff('/welcome', function(err, stuff) {
 });
 
 // If only the last request should be served, add a delay to debounce requests
-// be warn that it executes only the last queued callback
+// be warned that it executes only the first queued callback
 
 var cachedGetTheStuff = cacheOnDemand(getTheStuff, function(url) {
   // A URL makes a great hash key
@@ -44,6 +44,16 @@ getTheStuff('/welcome/bernard', function(err, stuff) {
 getTheStuff('/welcome/bernard', function(err, stuff) {
   console.log("called");
 });
+
+var cachedGetTheStuff = cacheOnDemand(getTheStuff, function(url) {
+  // A URL makes a great hash key
+  return url;
+}, {
+  timeout: 500,      // delay in milliseconds
+  maxTimeout: 5000   // if this parameter is set, subsequent calls reset timeout
+  // until there are no more calls or maxTimeout is reached
+});
+
 ```
 
 Under light load, with calls to `cachedGetTheStuff` taking place separated in time, every request for a given URL will get an individually generated response, which gives them the newest content. Just like calling `getTheStuff` directly.

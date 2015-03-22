@@ -8,28 +8,41 @@ function cacheDebounce(fn, hasher, timeout) {
 			return key;
 		};
 	}
+	var maxTimeout = 0;
+	if (typeof timeout == "object") {
+		maxTimeout = timeout.maxTimeout || 0;
+		timeout = timeout.timeout || 0;
+	}
 	var pending = {};
 	return function() {
 		// Get something we can slice
-		var argumentsArray = Array.prototype.slice.call(arguments);
-		var args = argumentsArray.slice(0, argumentsArray.length - 1);
-		var callback = argumentsArray[argumentsArray.length - 1];
+		var args = Array.prototype.slice.call(arguments);
 		var key = hasher.apply(this, args);
 		if (key === false) {
 			// hasher says this request can't be cached
-			return fn.apply(this, arguments);
+			return fn.apply(this, args);
+		}
+		var callback = args.pop();
+		if (typeof callback != 'function') {
+			throw new Error("cacheDebounce expects functions to be actors (callback as last argument)");
 		}
 		if (pending[key]) {
 			// A request is in progress, queue up to be sent
 			// the same result on completion
 			// unless there is debouncing in action
-			if (!timeout) pending[key].list.push(callback);
+			if (pending[key].timeout) {
+				if (maxTimeout && Date.now() - pending[key].now < maxTimeout) {
+					clearTimeout(pending[key].timeout);
+					pending[key].timeout = setTimeout(pending[key].fun, timeout);
+				}
+			}
+			pending[key].list.push(callback);
 			return;
 		}
 		// start a new pending queue
 		pending[key] = {list: [ callback ]};
 
-		function processCb(self, key, argumentsArray) {
+		function processCb(self, cbArgs) {
 			var obj = pending[key];
 			// Delete the queue before invoking the callbacks,
 			// so we don't risk establishing a chain with no
@@ -42,25 +55,25 @@ function cacheDebounce(fn, hasher, timeout) {
 			obj.list.forEach(function(cb) {
 				// Make sure we're async as the caller expects
 				setImmediate(function() {
-					cb.apply(self, argumentsArray);
+					cb.apply(self, cbArgs);
 				});
 			});
 		}
 
 		args.push(function() {
-			var obj = pending[key];
-			var argumentsArray = Array.prototype.slice.call(arguments);
-			var self = this;
-			if (timeout) {
-				if (!obj.timeout) {
-					obj.timeout = setTimeout(function() {
-						processCb(self, key, argumentsArray);
-					}, timeout);
-				} // else just debounce this callback
-			}
-			else processCb(self, key, argumentsArray);
+			processCb(this, Array.prototype.slice.call(arguments));
 		});
 
-		return fn.apply(this, args);
+		if (timeout) {
+			var self = this;
+			pending[key].fun = function() {
+				delete pending[key].timeout;
+				fn.apply(self, args);
+			};
+			pending[key].now = Date.now();
+			pending[key].timeout = setTimeout(pending[key].fun, timeout);
+		} else {
+			fn.apply(this, args);
+		}
 	};
 }
