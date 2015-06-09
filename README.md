@@ -1,4 +1,4 @@
-# debounce-on-demand
+# cache-debounce
 
 "On demand" caching that kicks in only when requests arrive simultaneously.
 
