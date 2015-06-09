@@ -3,7 +3,7 @@
 "On demand" caching that kicks in only when requests arrive simultaneously.
 
 ```javascript
-var cacheOnDemand = require('debounce-on-demand');
+var cacheOnDemand = require('cache-debounce');
 
 // Find all the things related to a URL.
 // Let's just say this is a slow operation.
