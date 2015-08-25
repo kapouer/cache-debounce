@@ -22,9 +22,13 @@ function cacheDebounce(fn, hasher, timeout) {
 			// hasher says this request can't be cached
 			return fn.apply(this, args);
 		}
+		if (key == undefined) {
+			console.trace('cache-debounce expects the hasher function to return something instead of', key);
+			return fn.apply(this, args);
+		}
 		var callback = args.pop();
 		if (typeof callback != 'function') {
-			throw new Error("cacheDebounce expects functions to be actors (callback as last argument)");
+			throw new Error("cache-debounce expects functions to be actors (callback as last argument)");
 		}
 		if (pending[key]) {
 			// A request is in progress, queue up to be sent
